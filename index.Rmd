@@ -2,29 +2,179 @@
 title: "portfolio"
 author: "Jelle Willems!"
 date: "2025-02-28"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+source("compmus.R")
+
 ```
 
-## R Markdown
+### Week 9: visualisations of track 1: "I. DAWN"
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+These are the figures for homework week 9:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#### Chromagram Track 1 (I. DAWN)
+```{r echo=FALSE}
 
-```{r cars}
-summary(cars)
+"features/jelle-w-1.json" |>                           # Change the track
+  compmus_chroma(norm = "identity") |>                 # Change the norm
+  ggplot(aes(x = time, y = pc, fill = value)) +
+  geom_raster() +
+  scale_y_continuous(
+    breaks = 0:11,
+    minor_breaks = NULL,
+    labels = c(
+                "C", "C#|Db", "D", "D#|Eb",
+                "E", "F", "F#|Gb", "G",
+                "G#|Ab", "A", "A#|Bb", "B"
+              )
+  ) +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+#### Cepstrogram Track 1 (I. DAWN)
+```{r echo=FALSE}
+"features/jelle-w-1.json" |>                           # Change the track
+  compmus_mfccs(norm = "identity") |>                  # Change the norm
+  ggplot(aes(x = time, y = mfcc, fill = value)) +
+  geom_raster() +
+  scale_y_continuous(
+    breaks = 0:12,
+    minor_breaks = NULL,
+  ) +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = "Coefficient Number", fill = NULL) +
+  theme_classic()                                      # Change the theme?
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#### Chroma-based self-similarity matrix
+```{r echo=FALSE}
+"features/jelle-w-1.json" |>                           # Change the track
+  compmus_chroma(norm = "identity") |>                 # Change the norm
+  compmus_self_similarity(
+    feature = pc,
+    distance = "chebyshev"                             # Change the distance
+  ) |>
+  ggplot(aes(x = xtime, y = ytime, fill = d)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+```
+
+The small squares on the main diagonal until t=25 show the unisono line being played. Furthermore, the climax is seen as a big blue-hued cross at t=120. From t=45, this song is based on a melodic talea, a cross-rhythm of harmony and melody, which makes it that there aren't many diagonal lines being seen as clear repetitions. The first 45 seconds however, do have a clear repeating of the opening motive, and is seen by the diagonal parallel lines to the main diagonal.
+
+#### Timbre-based self-similarity matrix
+```{r echo=FALSE}
+"features/jelle-w-1.json" |>                           # Change the track
+  compmus_mfccs(norm = "identity") |>                  # Change the norm
+  compmus_self_similarity(
+    feature = mfcc,
+    distance = "chebyshev"                             # Change the distance
+  ) |>
+  ggplot(aes(x = xtime, y = ytime, fill = d)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+
+```
+
+It is very clearly visible that there is an intro until around t=25, where the bass enters, changing the timbre. It is also visible that the timbre from there on until the ending (minus the outro seconds) gradually progresses. The main diagonal is divided into the intro, a big rectangle spanning about 3/4th of the rest of the song, and around t=110 the distorted high end is introduced, making for a difference in timbre as visible in the square on the main diagonal.
+
+### Week 9: visualisations of track 2: "III. AETNA"
+
+These are the figures for homework week 9:
+
+#### Chromagram Track 2 (III. AETNA)
+```{r echo=FALSE}
+
+"features/jelle-w-2.json" |>                           # Change the track
+  compmus_chroma(norm = "euclidean") |>                 # Change the norm
+  ggplot(aes(x = time, y = pc, fill = value)) + 
+  geom_raster() +
+  scale_y_continuous(
+    breaks = 0:11,
+    minor_breaks = NULL,
+    labels = c(
+                "C", "C#|Db", "D", "D#|Eb",
+                "E", "F", "F#|Gb", "G",
+                "G#|Ab", "A", "A#|Bb", "B"
+              )
+  ) +
+  scale_fill_viridis_c() +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+
+```
+
+
+#### Cepstrogram Track 2 (III. AETNA)
+```{r echo=FALSE}
+"features/jelle-w-2.json" |>                           # Change the track
+  compmus_mfccs(norm = "euclidean") |>                  # Change the norm
+  ggplot(aes(x = time, y = mfcc, fill = value)) + 
+  geom_raster() +
+  scale_y_continuous(
+    breaks = 0:12,
+    minor_breaks = NULL,
+  ) +
+  scale_fill_viridis_c() +               # Change the colours?
+  labs(x = "Time (s)", y = "Coefficient Number", fill = NULL) +
+  theme_classic()                                      # Change the theme?
+```
+
+The cepstogram shows the beat starting out sparse and growing until the switch to cymbals. In coefficient number 1, it is very clearly visible that the period of repetition around t=45 gets smaller.
+
+
+#### Chroma-based self-similarity matrix
+```{r echo=FALSE}
+"features/jelle-w-2.json" |>                           # Change the track
+  compmus_chroma(norm = "identity") |>                 # Change the norm
+  compmus_self_similarity(
+    feature = pc,
+    distance = "chebyshev"                             # Change the distance
+  ) |>   
+  ggplot(aes(x = xtime, y = ytime, fill = d)) + 
+  geom_raster() +
+  scale_fill_viridis_c() +               # Change the colours?
+  labs(x = "Time (s)", y = "Time (s)", fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+```
+
+The blue diagonal lines parallel to the main diagonal show the very clear repetitive structure of the song. Every harmonic scheme is ABAC form, and is repeated 3 times in its entirety. The blue lines show the beginning of the A forms, for a total of 6 times.
+
+
+#### Timbre-based self-similarity matrix
+```{r echo=FALSE}
+"features/jelle-w-2.json" |>                           # Change the track
+  compmus_mfccs(norm = "identity") |>                  # Change the norm
+  compmus_self_similarity(
+    feature = mfcc,
+    distance = "chebyshev"                             # Change the distance
+  ) |>   
+  ggplot(aes(x = xtime, y = ytime, fill = d)) + 
+  geom_raster() +
+  scale_fill_viridis_c() +               # Change the colours?
+  labs(x = "Time (s)", y = "Time (s)", fill = NULL) +
+  theme_classic()                                      # Change the theme?
+
+
+```
+
+There is a very clear visualization of 3 big squares on the main diagonal, these are the overarching sections, as this song is a repetition of a 3 times repeated harmonic scheme. Inside of the first big square, the main diagonal is divided into 4 smaller squares, as this is the structure of the harmonic scheme itself. In the arrangement of the song, we used plateau dynamics, meaning everytime the section is repeated, a big step up is seen, resulting in the 3 big squares. The outro is also very clearly visible.
